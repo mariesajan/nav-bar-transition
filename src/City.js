@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+const ITEM_PADDING = 10;
 class City extends React.Component {
     state = {
         hoverState: false
@@ -21,29 +22,31 @@ class City extends React.Component {
             hoverState: !this.state.hoverState
         })
     }
-    // to get left and width of clicked city using getBoundingClientRect to pass to parent function.
-    onClickOfCity = (event, id) => {
-        const width = event.target.getBoundingClientRect().width,
-            left = event.target.getBoundingClientRect().left;
-        this.props.onClickOfCity(id, width, left);
-    }
+    
     // to update color and fontweight styles based on mouseenter/mouseleave/onclick
     getCityStyle = () => {
         return {
-            margin: "10px",
+            boxSizing: "border-box",
+            padding: `${ITEM_PADDING}px`,
             color: this.props.isSelected ? 'black' : (this.state.hoverState ? 'blue' : 'gray'),
-            paddingBottom: "15px",
+            paddingBottom: "25px",
             fontWeight: this.props.isSelected ? '600' : '400'
         }
+    }
+
+    // call click handler of city with new width and height
+    callCityClickHandler = (target, id) => {
+        let width = target.getBoundingClientRect().width - 2 * ITEM_PADDING,
+            left = target.getBoundingClientRect().left;
+
+        this.props.onClickOfCity(id, width, left);
     }
 
     // get new left and width values after window resize
     onWindowResize = () => {
         setTimeout(() => {
             if(this.props.isSelected) {
-                let width = this.element.current.getBoundingClientRect().width,
-                    left = this.element.current.getBoundingClientRect().left;
-                this.props.onClickOfCity(this.props.id, width, left);
+                this.callCityClickHandler(this.element.current, this.props.id);
             }
         }, 500);
     }
@@ -53,7 +56,7 @@ class City extends React.Component {
         return (
             <div ref={this.element} style={this.getCityStyle()} 
                 onMouseEnter={this.onHoverOfCity} onMouseLeave={this.onHoverOfCity} 
-                onClick={(event) => this.onClickOfCity(event, this.props.id)}>
+                onClick={(event) => this.callCityClickHandler(event.target, this.props.id)}>
                     {this.props.city}
             </div>
         );

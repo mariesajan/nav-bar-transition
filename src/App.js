@@ -55,7 +55,7 @@ class App extends React.Component {
       left: this.state.leftOfLine,
       width: this.state.widthOfLine,
       borderBottom: "1px solid black",
-      transition: "left 1s ease, width 1s ease"
+      transition: "left 300ms ease, width 300ms ease"
     }
   }
 
