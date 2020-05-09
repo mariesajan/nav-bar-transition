@@ -2,34 +2,62 @@ import React from 'react';
 import CityGroup from './CityGroup';
 import navData from './navigation.json';
 
+const ITEM_PADDING = 10;
 class App extends React.Component {
-  state = {
-    cities: navData.cities,
-    leftOfLine: 0,
-    widthOfLine: 0,
-    time: ''
+  constructor(props) {
+    super(props);
+
+    this.timer = null;
+    this.state = {
+      cities: navData.cities,
+      leftOfLine: 0,
+      widthOfLine: 0,
+      time: '',
+      selectedSection: null, // to get the value of selected city 
+      selectedCityRef: null,  // to handle the left and width position of nav underline
+    };
+  }
+ 
+  componentDidMount() {
+    window.addEventListener('resize', this.onWindowResize);
+  }
+
+  componentWillUnmount() {
+      window.removeEventListener('resize', this.onWindowResize);
+  }
+
+  // on window resize, call onSelection() if city is selected 
+  onWindowResize = () => { 
+      if(this.timer) {
+          window.cancelAnimationFrame(this.timer);
+      }
+      this.timer = window.requestAnimationFrame(() => {
+          if(this.state.selectedSection) {
+              this.onSelection(this.state.selectedSection, this.state.selectedCityRef);
+          }
+      })
   }
 
   // update the states city, left and width (to handle underline of City and update time)
-  onClickOfCity = (id, width, left) => {
+  onSelection = (section, cityRef) => {
+    let width = cityRef.current.getBoundingClientRect().width - 2 * ITEM_PADDING,
+        left = cityRef.current.getBoundingClientRect().left;
     this.setState({
-      cities: this.state.cities.map(city => {
-        city.section===id ? city.selected = true : city.selected = false;
-        return city;
-      }),
       leftOfLine: left,
-      widthOfLine: width
+      widthOfLine: width,
+      selectedSection: section,
+      selectedCityRef: cityRef
     })
-    this.getTime(id); // to update the timezone when city is clicked
+    this.setTime(section); // to update the state 'time' when city is clicked
   }
 
-  // to find time based on timezone name
-  getTime = (id) => { 
+  // to update state 'time' based on timezone name
+  setTime = (id) => { 
     let timezoneName = '', time = '';
     
     this.state.cities.map(city => {
       if(city.section === id) {
-        timezoneName =  city["timezone-name"];
+        timezoneName =  city["timezoneName"];
       }
       return timezoneName;
     });
@@ -40,13 +68,7 @@ class App extends React.Component {
     });
   }
 
-  // update left and width value based on clicked city to handle nav line style
-  updatePosition = (left, width) => {
-    this.setState({
-      leftOfLine: left,
-      widthOfLine: width
-    })
-  } 
+  
 
   getNavLineStyle = () => {
     return {
@@ -58,14 +80,16 @@ class App extends React.Component {
       transition: "left 300ms ease, width 300ms ease"
     }
   }
-
   render() {
     return (
       <div>
-        <div style={cityContainer}>
-          <CityGroup cities={this.state.cities} onClickOfCity={this.onClickOfCity} 
-            updatePosition={this.updatePosition} />
-        </div>
+        <nav style={cityContainer}>
+          <CityGroup 
+            cities={this.state.cities} 
+            onSelection={this.onSelection} 
+            selectedSection={this.state.selectedSection} 
+          />
+        </nav>
         <div style={this.getNavLineStyle()}> </div>
         <hr  style={lineStyle} />
         <div style={timeStyle}>
@@ -87,8 +111,9 @@ const lineStyle = {
 };
 const cityContainer = {
   margin: "10px 20px",
-  display: "flex",
+  display: "grid",
   justifyContent: "space-around",
+  gridAutoFlow: "column"
 };
 
 const timeStyle = {

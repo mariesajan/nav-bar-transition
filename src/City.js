@@ -3,17 +3,14 @@ import PropTypes from 'prop-types';
 
 const ITEM_PADDING = 10;
 class City extends React.Component {
-    state = {
-        hoverState: false
-    } 
-    element = React.createRef();
+    constructor(props) {
+        super(props);
 
-    componentDidMount() {
-        window.addEventListener('resize', this.onWindowResize);
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('resize', this.onWindowResize);
+        this.state = {
+            hoverState: false
+        } 
+        this.cityRef = React.createRef();
+        this.timer = null;
     }
 
     // to update hoverState based on mouseenter/mouseleve
@@ -25,38 +22,24 @@ class City extends React.Component {
     
     // to update color and fontweight styles based on mouseenter/mouseleave/onclick
     getCityStyle = () => {
+        const isSelected = (this.props.selectedSection === this.props.section) ;
         return {
             boxSizing: "border-box",
             padding: `${ITEM_PADDING}px`,
-            color: this.props.isSelected ? 'black' : (this.state.hoverState ? 'blue' : 'gray'),
+            color: isSelected
+                ? 'black' 
+                : (this.state.hoverState ? '#4795d5' : 'gray'),
             paddingBottom: "25px",
-            fontWeight: this.props.isSelected ? '600' : '400'
+            fontWeight: isSelected  ? '600' : '400'
         }
-    }
-
-    // call click handler of city with new width and height
-    callCityClickHandler = (target, id) => {
-        let width = target.getBoundingClientRect().width - 2 * ITEM_PADDING,
-            left = target.getBoundingClientRect().left;
-
-        this.props.onClickOfCity(id, width, left);
-    }
-
-    // get new left and width values after window resize
-    onWindowResize = () => {
-        setTimeout(() => {
-            if(this.props.isSelected) {
-                this.callCityClickHandler(this.element.current, this.props.id);
-            }
-        }, 500);
     }
     
 
     render() {
         return (
-            <div ref={this.element} style={this.getCityStyle()} 
+            <div ref={this.cityRef} style={this.getCityStyle()} 
                 onMouseEnter={this.onHoverOfCity} onMouseLeave={this.onHoverOfCity} 
-                onClick={(event) => this.callCityClickHandler(event.target, this.props.id)}>
+                onClick={(event) => this.props.onSelection(this.props.section, this.cityRef)}>
                     {this.props.city}
             </div>
         );
@@ -65,9 +48,10 @@ class City extends React.Component {
 
 
 City.propTypes = {
-    id: PropTypes.string.isRequired,
+    section: PropTypes.string.isRequired,
     city: PropTypes.string.isRequired,
-    onClickOfCity: PropTypes.func.isRequired
+    onSelection: PropTypes.func.isRequired,
+    selectedSection: PropTypes.string
 };
 
 export default City;
