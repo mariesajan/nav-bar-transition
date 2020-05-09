@@ -23,3 +23,7 @@ In this problem,
    ```
 
 4. Open the browser at [http://localhost:3000](http://localhost:3000)
+
+
+
+![](nav-bar.gif)
