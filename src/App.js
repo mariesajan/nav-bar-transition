@@ -1,8 +1,32 @@
 import React from 'react';
 import CityGroup from './CityGroup';
 import navData from './navigation.json';
+import styled from 'styled-components';
 
 const ITEM_PADDING = 10;
+
+const StyledMenuContainer = styled.nav`
+  margin: 10px 20px;
+  display: grid;
+  justify-content: space-around;
+  grid-auto-flow: column;
+`;
+
+
+const StyledTimeContainer = styled.div`
+  text-align: center;
+  margin-top: 50px;
+  font-size: 50px;
+`;
+
+const StyledNavLineContainer = styled.div`
+  position: relative;
+  top: -20px;
+  left: ${props => props.left}px;
+  width: ${props => props.width}px;
+  border-bottom: 1px solid black;
+  transition: left 300ms ease, width 300ms ease;
+`;
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -67,34 +91,24 @@ class App extends React.Component {
       time: time
     });
   }
-
   
-
-  getNavLineStyle = () => {
-    return {
-      position: "relative",
-      top: "-20px",
-      left: this.state.leftOfLine,
-      width: this.state.widthOfLine,
-      borderBottom: "1px solid black",
-      transition: "left 300ms ease, width 300ms ease"
-    }
-  }
   render() {
     return (
       <div>
-        <nav style={cityContainer}>
+        <StyledMenuContainer>
           <CityGroup 
             cities={this.state.cities} 
             onSelection={this.onSelection} 
             selectedSection={this.state.selectedSection} 
           />
-        </nav>
-        <div style={this.getNavLineStyle()}> </div>
+          </StyledMenuContainer>
+        <StyledNavLineContainer 
+          left={this.state.leftOfLine}
+          width={this.state.widthOfLine}/>
         <hr  style={lineStyle} />
-        <div style={timeStyle}>
+        <StyledTimeContainer>
           {this.state.time}
-        </div>
+        </StyledTimeContainer>
       </div>
         
     );
@@ -109,17 +123,8 @@ const lineStyle = {
   height: "1px",
   border: "none"
 };
-const cityContainer = {
-  margin: "10px 20px",
-  display: "grid",
-  justifyContent: "space-around",
-  gridAutoFlow: "column"
-};
 
-const timeStyle = {
-  textAlign: "center",
-  marginTop: "50px",
-  fontSize: "50px"
-};
+
+
 
 export default App;
