@@ -27,6 +27,15 @@ const StyledNavLineContainer = styled.div`
   border-bottom: 1px solid black;
   transition: left 300ms ease, width 300ms ease;
 `;
+
+const StyledLine = styled.hr`
+  position: relative;
+  top: -20px;
+  margin: 0 20px;
+  background-color: lightgray;
+  height: 1px;
+  border: none;
+`;
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -101,11 +110,11 @@ class App extends React.Component {
             onSelection={this.onSelection} 
             selectedSection={this.state.selectedSection} 
           />
-          </StyledMenuContainer>
+        </StyledMenuContainer>
         <StyledNavLineContainer 
           left={this.state.leftOfLine}
           width={this.state.widthOfLine}/>
-        <hr  style={lineStyle} />
+        <StyledLine />
         <StyledTimeContainer>
           {this.state.time}
         </StyledTimeContainer>
@@ -114,17 +123,5 @@ class App extends React.Component {
     );
   }
 }
-
-const lineStyle = {
-  position: "relative",
-  top: "-20px",
-  margin: "0 20px",
-  backgroundColor: "lightgray",
-  height: "1px",
-  border: "none"
-};
-
-
-
 
 export default App;
